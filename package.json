@@ -9,6 +9,7 @@
   "author": "Samuli Hirvonen <hirvonensamuli@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "config.json": "0.0.4",
     "node-telegram-bot-api": "^0.23.3"
   }
 }
