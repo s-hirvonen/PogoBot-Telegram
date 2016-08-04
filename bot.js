@@ -34,6 +34,20 @@ module.exports = function(config) {
         bot.sendMessage(msg.from.id, printWatchlist());
     });
 
+    // Help command
+    // Lists all the available commands
+    bot.onText(/\/help/, function(msg) {
+        bot.sendMessage(
+            msg.from.id,
+            'Hello! I am PogoBot, and alert you of nearby Pokémon!\n\n' +
+            'The following commands are available to you:\n' +
+            '/add name [name2]... - Add Pokémon to the watchlist.\n' +
+            '/remove name [name2]... - Remove alerts from the specified Pokémon.\n' +
+            '/list - Display your watchlist.\n' +
+            '/help - Display this message'
+        );
+    });
+
     function splitCommandArgs(str) {
         return str.split(/[\s,]/).filter(function(value) {
             return value !== '';
