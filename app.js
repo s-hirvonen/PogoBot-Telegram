@@ -5,3 +5,7 @@ var express = require('express'),
     config = require('config.json')('./config.json'),
     bot = require('./bot')(config),
     listener = require('./listener')(server, bot, config);
+
+listener.on('pokemon', function(message) {
+    console.log('Pokemon event!', message);
+});

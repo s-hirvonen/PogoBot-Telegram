@@ -1,14 +1,21 @@
 'use strict';
 
 var bodyParser = require('body-parser'),
-    jsonParser = bodyParser.json();
+    jsonParser = bodyParser.json(),
+    events = require('events');
 
 module.exports = function(app, bot, config) {
+
+    var emitter = new events.EventEmitter();
 
     app.use(jsonParser);
 
     app.post('/', function(req, res, next) {
-        console.log(req.body);
+
+        if (req.body.type === 'pokemon') {
+            emitter.emit('pokemon', req.body.message);
+        }
+
         next();
     });
 
@@ -16,4 +23,5 @@ module.exports = function(app, bot, config) {
         console.log('Express listening on port ' + config.port);
     });
 
+    return emitter;
 };
