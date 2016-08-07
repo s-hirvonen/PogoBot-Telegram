@@ -5,8 +5,39 @@ var TelegramBot = require('node-telegram-bot-api');
 module.exports = function(config) {
 
     var bot = new TelegramBot(config.api_token, {polling: true});
-
     var pokemon = config.watchlist;
+    var exports = {};
+
+    var activeUsers = [];
+
+    // Public interface
+    exports.broadcast = function(message) {
+        for (var i = 0; i < activeUsers.length; ++i) {
+            bot.sendMessage(activeUsers[i], message);
+        }
+    };
+
+    // Start command
+    bot.onText(/\/start/, function(msg, match) {
+        if (activeUsers.indexOf(msg.from.id) === -1) {
+            activeUsers.push(msg.from.id);
+        }
+
+        bot.sendMessage(msg.from.id, 'Bot activated! Type /stop to stop.');
+        console.log('Users active: ' + activeUsers.join(', '));
+    });
+
+    // Stop command
+    bot.onText(/\/stop/, function(msg, match) {
+        var i = activeUsers.indexOf(msg.from.id) ;
+
+        if (i !== -1) {
+            activeUsers.splice(i, 1);
+        }
+
+        bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
+        console.log('Users active: ' + activeUsers.join(', '));
+    });
 
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
@@ -58,6 +89,6 @@ module.exports = function(config) {
         return 'Pokémon on your watchlist:\n\n' + pokemon.join('\n');
     }
 
-    return bot;
+    return exports;
 }
 
