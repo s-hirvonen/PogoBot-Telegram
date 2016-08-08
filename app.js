@@ -7,8 +7,19 @@ var fs = require('fs'),
     request = require('request').defaults({ encoding: null }),
     server = express(),
     config = require('config.json')('./config.json'),
+    mongoose = require('mongoose'),
     bot = require('./src/bot')(config),
     listener = require('./src/listener')(server, config);
+
+mongoose.connect(config.mongodb);
+var db = mongoose.connection;
+db.once('open', function() {
+    logger.info('Connected to Mongodb on %s', config.mongodb);
+});
+db.on('error', function() {
+    logger.error('Mongodb connection failed!');
+});
+
 
 var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
 var seen = []; // Contains encounter ids of already processed pokemen
@@ -20,20 +31,26 @@ logger.level = 'debug';
 // Unfiltered at this point
 listener.on('pokemon', function(payload) {
 
+    //logger.debug(payload);
+
+    var User = require('./src/user');
+
     if (seen.indexOf(payload.encounter_id) !== -1) {
         return;
     }
 
     seen.push(payload.encounter_id);
 
-    logger.log('debug', payload);
+    // Find all users that are active and watching this pokemon
+    var query = User.find({ active: true, watchlist: Number(payload.pokemon_id) });
 
-    if (!bot.isWatching(pokemon[payload.pokemon_id])) {
-        return;
-    }
+    query.then(function(users) {
+        logger.debug(users);
+    });
 
-    logger.log('debug', payload);
+});
 
+function sendPhoto(payload) {
     var photoFilePath = './.tmp/' + payload.encounter_id + '.png';
     var photo = fs.createWriteStream(photoFilePath);
     getMap(payload.latitude, payload.longitude).pipe(photo);
@@ -45,8 +62,7 @@ listener.on('pokemon', function(payload) {
             '(' + timeToDisappear(payload.disappear_time) + ' left)'
         );
     });
-
-});
+}
 
 function timeToDisappear(timestamp) {
     var diff = moment.unix(timestamp).diff(moment());

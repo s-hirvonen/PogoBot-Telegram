@@ -1,10 +1,15 @@
 'use strict';
 
-var TelegramBot = require('node-telegram-bot-api');
+var TelegramBot = require('node-telegram-bot-api'),
+    logger = require('winston'),
+    _ = require('lodash'),
+    fs = require('fs'),
+    User = require('./user.js');
 
 module.exports = function(config) {
 
     var bot = new TelegramBot(config.api_token, {polling: true});
+    var pokedex = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
     var pokemon = config.watchlist;
     var exports = {};
 
@@ -35,50 +40,71 @@ module.exports = function(config) {
 
     // Start command
     bot.onText(/\/start/, function(msg, match) {
-        if (activeUsers.indexOf(msg.from.id) === -1) {
-            activeUsers.push(msg.from.id);
-        }
+
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
+            if (created) {
+                logger.info('Created new user with id %s', user.telegramId);
+                // Newj users start with the default watchlist
+                user.watchlist = config.watchlist;
+            }
+
+            user.active = true;
+
+            user.save();
+            logger.info('User %s is now active', user.telegramId);
+            logger.debug(user.watchlist);
+        });
 
         bot.sendMessage(msg.from.id, 'Bot activated! Type /stop to stop.');
-        console.log('Users active: ' + activeUsers.join(', '));
     });
 
     // Stop command
     bot.onText(/\/stop/, function(msg, match) {
-        var i = activeUsers.indexOf(msg.from.id) ;
-
-        if (i !== -1) {
-            activeUsers.splice(i, 1);
-        }
-
-        bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
-        console.log('Users active: ' + activeUsers.join(', '));
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            user.active = false;
+            user.save();
+            logger.info('User %s is now inactive', user.telegramId);
+            bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
+        });
     });
 
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
     bot.onText(/\/add (.+)/, function(msg, match) {
-        var toAdd = splitCommandArgs(match[1]);
-        pokemon = pokemon.concat(toAdd);
-        bot.sendMessage(msg.from.id, 'Added ' + toAdd.join(', ') + '!');
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            var toAdd = splitCommandArgs(match[1]);
+            var toAddIds = getPokemonIdsByNames(toAdd);
+
+            user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
+                return a - b;
+            });
+            user.save();
+
+            bot.sendMessage(msg.from.id, 'Added ' + toAdd.join(', ') + '!');
+        });
     });
 
     // Remove command
     // Accepts a space or comma-separated list of Pokemen to unwatch
     bot.onText(/\/remove (.+)/, function(msg, match) {
-        var toRemove = splitCommandArgs(match[1]);
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            var toRemove = splitCommandArgs(match[1]);
+            var toRemoveIds = getPokemonIdsByNames(toRemove);
 
-        pokemon = pokemon.filter(function(p) {
-            return toRemove.indexOf(p) === -1;
+            user.watchlist = user.watchlist.filter(function(number) {
+                toRemoveIds.indexOf(number) === -1;
+            });
+
+            user.save();
         });
-
-        bot.sendMessage(msg.from.id, printWatchlist());
     });
 
     // List command
     // Lists all the pokemen currently on the watchlist
     bot.onText(/\/list/, function(msg) {
-        bot.sendMessage(msg.from.id, printWatchlist());
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
+        });
     });
 
     // Help command
@@ -95,14 +121,32 @@ module.exports = function(config) {
         );
     });
 
+    // Receives an array and returns the pokedex numbers of the given pokemen
+    // If a given pokemon name doesn't exist, it is ignored.
+    function getPokemonIdsByNames(names) {
+        return names.map(function(name) {
+            return _.findKey(pokedex, function(p) {
+                return p === name;
+            });
+        }).filter(function(p) {
+            return p !== undefined;
+        }).map(function(p) {
+            return Number(p);
+        });
+    }
+
     function splitCommandArgs(str) {
         return str.split(/[\s,]/).filter(function(value) {
             return value !== '';
         });
     }
 
-    function printWatchlist() {
-        return 'Pokémon on your watchlist:\n\n' + pokemon.join('\n');
+    function printWatchlist(list) {
+        var names = list.map(function(number) {
+            return pokedex[number];
+        });
+
+        return 'Pokémon on your watchlist:\n\n' + names.join('\n');
     }
 
     return exports;
