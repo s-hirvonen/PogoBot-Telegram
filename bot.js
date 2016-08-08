@@ -11,11 +11,27 @@ module.exports = function(config) {
     var activeUsers = [];
 
     // Public interface
+    // -----------------------------------------------------------------------
+
     exports.broadcast = function(message) {
         for (var i = 0; i < activeUsers.length; ++i) {
             bot.sendMessage(activeUsers[i], message);
         }
     };
+
+    exports.sendPhotoNotification = function(photo, pokemon_id) {
+        for (var i = 0; i < activeUsers.length; ++i) {
+            bot.sendPhoto(activeUsers[i], photo, {
+                caption: 'A wild ' + pokemon_id + ' appeared!'
+            });
+        }
+    };
+
+    exports.isWatching = function(poke) {
+        return pokemon.indexOf(poke) !== -1;
+    };
+
+    // -----------------------------------------------------------------------
 
     // Start command
     bot.onText(/\/start/, function(msg, match) {
@@ -43,7 +59,7 @@ module.exports = function(config) {
     // Accepts a space or comma-separated list of Pokemen to watch
     bot.onText(/\/add (.+)/, function(msg, match) {
         var toAdd = splitCommandArgs(match[1]);
-        pokemon.push(toAdd);
+        pokemon = pokemon.concat(toAdd);
         bot.sendMessage(msg.from.id, 'Added ' + toAdd.join(', ') + '!');
     });
 
