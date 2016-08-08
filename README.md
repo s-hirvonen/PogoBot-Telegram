@@ -3,6 +3,8 @@ PogoBot-Telegram
 
 Configurable PokemonGo-Map alerts via Telegram.
 
+<img src=http://i.imgur.com/7zscpP7.png width=30% height=30%>
+
 Features
 --------
 
