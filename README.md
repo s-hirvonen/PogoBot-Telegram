@@ -34,10 +34,10 @@ Installation
 1. Clone this repo
 2. `npm install`
 3. Copy and rename `config.json.example` to `config.json`
-4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file.
+4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file. For this project, also enable Google Static Maps API for that key on the [developer console](https://console.developers.google.com/apis/dashboard).
 5. Set your MongoDB path in `config.json`.
-5. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file.
-6. Start your PokemonGo-Map with webhook support (-wh flag).
+6. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file.
+7. Start your PokemonGo-Map with webhook support (-wh flag).
 
 Usage
 -----
