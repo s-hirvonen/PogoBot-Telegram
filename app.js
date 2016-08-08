@@ -7,8 +7,19 @@ var fs = require('fs'),
     request = require('request').defaults({ encoding: null }),
     server = express(),
     config = require('config.json')('./config.json'),
-    bot = require('./bot')(config),
-    listener = require('./listener')(server, config);
+    mongoose = require('mongoose'),
+    bot = require('./src/bot')(config),
+    listener = require('./src/listener')(server, config);
+
+mongoose.connect(config.mongodb);
+var db = mongoose.connection;
+db.once('open', function() {
+    logger.info('Connected to Mongodb on %s', config.mongodb);
+});
+db.on('error', function() {
+    logger.error('Mongodb connection failed!');
+});
+
 
 var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
 var seen = []; // Contains encounter ids of already processed pokemen
@@ -24,29 +35,43 @@ listener.on('pokemon', function(payload) {
         return;
     }
 
+    logger.info(
+        'A wild %s appeared! Disappear time %s',
+        pokemon[payload.pokemon_id],
+        payload.disappear_time
+    );
+
+    var User = require('./src/user');
+
+
     seen.push(payload.encounter_id);
 
-    logger.log('debug', payload);
+    // Find all users that are active and watching this pokemon
+    var query = User.find({ active: true, watchlist: Number(payload.pokemon_id) });
 
-    if (!bot.isWatching(pokemon[payload.pokemon_id])) {
-        return;
-    }
+    query.then(function(users) {
+        var userIds = users.map(function(user) {
+            return user.telegramId;
+        });
+        sendPhoto(userIds, payload);
+    });
 
-    logger.log('debug', payload);
+});
 
+function sendPhoto(users, payload) {
     var photoFilePath = './.tmp/' + payload.encounter_id + '.png';
     var photo = fs.createWriteStream(photoFilePath);
     getMap(payload.latitude, payload.longitude).pipe(photo);
     photo.on('close', function() {
         bot.sendPhotoNotification(
+            users,
             photoFilePath,
             'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
             'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
             '(' + timeToDisappear(payload.disappear_time) + ' left)'
         );
     });
-
-});
+}
 
 function timeToDisappear(timestamp) {
     var diff = moment.unix(timestamp).diff(moment());
