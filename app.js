@@ -31,13 +31,18 @@ logger.level = 'debug';
 // Unfiltered at this point
 listener.on('pokemon', function(payload) {
 
-    //logger.debug(payload);
-
-    var User = require('./src/user');
-
     if (seen.indexOf(payload.encounter_id) !== -1) {
         return;
     }
+
+    logger.info(
+        'A wild %s appeared! Disappear time %s',
+        pokemon[payload.pokemon_id],
+        payload.disappear_time
+    );
+
+    var User = require('./src/user');
+
 
     seen.push(payload.encounter_id);
 
@@ -45,17 +50,21 @@ listener.on('pokemon', function(payload) {
     var query = User.find({ active: true, watchlist: Number(payload.pokemon_id) });
 
     query.then(function(users) {
-        logger.debug(users);
+        var userIds = users.map(function(user) {
+            return user.telegramId;
+        });
+        sendPhoto(userIds, payload);
     });
 
 });
 
-function sendPhoto(payload) {
+function sendPhoto(users, payload) {
     var photoFilePath = './.tmp/' + payload.encounter_id + '.png';
     var photo = fs.createWriteStream(photoFilePath);
     getMap(payload.latitude, payload.longitude).pipe(photo);
     photo.on('close', function() {
         bot.sendPhotoNotification(
+            users,
             photoFilePath,
             'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
             'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +

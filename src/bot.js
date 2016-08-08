@@ -24,12 +24,12 @@ module.exports = function(config) {
         }
     };
 
-    exports.sendPhotoNotification = function(photo, caption) {
-        for (var i = 0; i < activeUsers.length; ++i) {
-            bot.sendPhoto(activeUsers[i], photo, {
+    exports.sendPhotoNotification = function(users, photo, caption) {
+        _.forEach(users, function(user) {
+            bot.sendPhoto(user, photo, {
                 caption: caption
             });
-        }
+        });
     };
 
     exports.isWatching = function(poke) {
