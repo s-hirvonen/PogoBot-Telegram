@@ -7,8 +7,8 @@ var fs = require('fs'),
     request = require('request').defaults({ encoding: null }),
     server = express(),
     config = require('config.json')('./config.json'),
-    bot = require('./bot')(config),
-    listener = require('./listener')(server, config);
+    bot = require('./src/bot')(config),
+    listener = require('./src/listener')(server, config);
 
 var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
 var seen = []; // Contains encounter ids of already processed pokemen
