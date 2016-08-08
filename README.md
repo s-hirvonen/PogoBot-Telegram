@@ -21,6 +21,13 @@ Commands
 `/list` - Lists Pokémon currently on your watchlist  
 `/help` - Displays this helpful list of commands
 
+Requirements
+------------
+
+* Node.js
+* MongoDB
+* [PokemonGo-Map](https://github.com/PokemonGoMap/PokemonGo-Map) instance that has webhook support enabled
+
 Installation
 ------------
 
@@ -28,8 +35,9 @@ Installation
 2. `npm install`
 3. Copy and rename `config.json.example` to `config.json`
 4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file.
-5. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file
-6. Start your PokemonGo-Map with webhook support (-wh flag)
+5. Set your MongoDB path in `config.json`.
+5. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file.
+6. Start your PokemonGo-Map with webhook support (-wh flag).
 
 Usage
 -----
