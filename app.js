@@ -2,6 +2,7 @@
 
 var fs = require('fs'),
     logger = require('winston'),
+    moment = require('moment'),
     express = require('express'),
     request = require('request').defaults({ encoding: null }),
     server = express(),
@@ -37,10 +38,25 @@ listener.on('pokemon', function(payload) {
     var photo = fs.createWriteStream(photoFilePath);
     getMap(payload.latitude, payload.longitude).pipe(photo);
     photo.on('close', function() {
-        bot.sendPhotoNotification(photoFilePath, pokemon[payload.pokemon_id]);
-    })
+        bot.sendPhotoNotification(
+            photoFilePath,
+            'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
+            'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
+            '(' + timeToDisappear(payload.disappear_time) + ' left)'
+        );
+    });
 
 });
+
+function timeToDisappear(timestamp) {
+    var diff = moment.unix(timestamp).diff(moment());
+    return moment.duration(diff).humanize();
+}
+
+function disappearTime(timestamp) {
+    var time = moment.unix(timestamp);
+    return [time.hour(), time.minutes(), time.seconds()].join(':');
+}
 
 function getMap(lat, lon, cb) {
     return request({

@@ -19,10 +19,10 @@ module.exports = function(config) {
         }
     };
 
-    exports.sendPhotoNotification = function(photo, pokemon_id) {
+    exports.sendPhotoNotification = function(photo, caption) {
         for (var i = 0; i < activeUsers.length; ++i) {
             bot.sendPhoto(activeUsers[i], photo, {
-                caption: 'A wild ' + pokemon_id + ' appeared!'
+                caption: caption
             });
         }
     };
