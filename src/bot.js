@@ -40,14 +40,13 @@ module.exports = function(config) {
             if (created) {
                 logger.info('Created new user with id %s', user.telegramId);
                 // New users start with the default watchlist
-                user.watchlist = config.watchlist;
+                user.watchlist = getPokemonIdsByNames(config.watchlist);
             }
 
             user.active = true;
 
             user.save();
             logger.info('User %s is now active', user.telegramId);
-            logger.debug(user.watchlist);
         });
 
         bot.sendMessage(msg.from.id, 'Bot activated! Type /stop to stop.');
