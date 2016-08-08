@@ -43,6 +43,6 @@ Contributing
 PRs are more than welcome! Feature suggestions can also be sent as issues labeled as 'enhancement'.
 Currently planned features on my list are
 
-* Persistent watchlists
-* Full multiuser support (same bot can handle multiple users and their watchlists)
-* Cleanup procedure for deleting expired Pokémen and map images
+- [x] Persistent watchlists
+- [x] Full multiuser support (same bot can handle multiple users and their watchlists)
+- [ ] Cleanup procedure for deleting expired Pokémen and map images
