@@ -1,14 +1,21 @@
 {
   "name": "pogobot-telegram",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Telegram bot for creating and configuring notifications about nearby Pokémon",
-  "main": "bot.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Samuli Hirvonen <hirvonensamuli@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "node-telegram-bot-api": "^0.23.3"
+    "body-parser": "^1.15.2",
+    "config.json": "0.0.4",
+    "express": "^4.14.0",
+    "moment": "^2.14.1",
+    "node-telegram-bot-api": "^0.23.3",
+    "request": "^2.74.0",
+    "winston": "^2.2.0"
   }
 }
