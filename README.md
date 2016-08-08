@@ -1,9 +1,10 @@
-PogoBot
-=======
+PogoBot-Telegram
+================
 
 Configurable PokemonGo-Map alerts via Telegram.
 
-=======
+<img src=http://i.imgur.com/7zscpP7.png width=30% height=30%>
+
 Features
 --------
 
@@ -13,11 +14,11 @@ Features
 Commands
 --------
 
-`/start` - Start receiving notifications
-`/stop` - Stop notifications (bot still remains online until you kill the node app)
-`/add pokemon [pokemon]...` - Adds Pokémon to the watchlist (space or comma separated list)
-`/remove pokemon [pokemon]...` - Removes Pokémon from the watchlist (space or comma separated list)
-`/list` - Lists Pokémon currently on your watchlist
+`/start` - Start receiving notifications  
+`/stop` - Stop notifications (bot still remains online until you kill the node app)  
+`/add pokemon [pokemon]...` - Adds Pokémon to the watchlist (space or comma separated list)  
+`/remove pokemon [pokemon]...` - Removes Pokémon from the watchlist (space or comma separated list)  
+`/list` - Lists Pokémon currently on your watchlist  
 `/help` - Displays this helpful list of commands
 
 Installation
@@ -27,7 +28,8 @@ Installation
 2. `npm install`
 3. Copy and rename `config.json.example` to `config.json`
 4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file.
-5. Set your Telegram bot up by following [these instructions](https://core.telegram.og/bots#3-how-do-i-create-a-bot). Set your api token in the config file
+5. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file
+6. Start your PokemonGo-Map with webhook support (-wh flag)
 
 Usage
 -----
