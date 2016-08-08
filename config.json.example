@@ -1,0 +1,11 @@
+{
+    "api_token": "",
+    "gmap_key": "",
+    "port": 4000,
+    "watchlist": [
+        "Venusaur",
+        "Blastoise",
+        "Charizard",
+        "Dragonite"
+    ]
+}
