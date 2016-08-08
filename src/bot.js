@@ -32,19 +32,14 @@ module.exports = function(config) {
         });
     };
 
-    exports.isWatching = function(poke) {
-        return pokemon.indexOf(poke) !== -1;
-    };
-
     // -----------------------------------------------------------------------
 
     // Start command
     bot.onText(/\/start/, function(msg, match) {
-
         User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             if (created) {
                 logger.info('Created new user with id %s', user.telegramId);
-                // Newj users start with the default watchlist
+                // New users start with the default watchlist
                 user.watchlist = config.watchlist;
             }
 
@@ -79,8 +74,6 @@ module.exports = function(config) {
                 return a - b;
             });
             user.save();
-
-            bot.sendMessage(msg.from.id, 'Added ' + toAdd.join(', ') + '!');
         });
     });
 
@@ -92,7 +85,7 @@ module.exports = function(config) {
             var toRemoveIds = getPokemonIdsByNames(toRemove);
 
             user.watchlist = user.watchlist.filter(function(number) {
-                toRemoveIds.indexOf(number) === -1;
+                return toRemoveIds.indexOf(number) === -1;
             });
 
             user.save();
