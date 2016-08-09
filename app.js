@@ -1,14 +1,9 @@
 'use strict';
 
-var fs       = require('fs'),
-    logger   = require('winston'),
+var logger   = require('winston'),
     express  = require('express'),
     config   = require('config.json')('./config.json'),
     mongoose = require('mongoose');
-
-if (!fs.existsSync('./.tmp')) {
-    fs.mkdirSync('./.tmp');
-}
 
 config.logger = logger;
 
