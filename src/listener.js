@@ -7,6 +7,7 @@ var bodyParser = require('body-parser'),
 module.exports = function(app, config) {
 
     var emitter = new events.EventEmitter();
+    var logger = config.logger;
 
     app.use(jsonParser);
 
@@ -20,7 +21,7 @@ module.exports = function(app, config) {
     });
 
     app.listen(config.port, function() {
-        console.log('Express listening on port ' + config.port);
+        logger.info('Express listening on port ' + config.port);
     });
 
     return emitter;
