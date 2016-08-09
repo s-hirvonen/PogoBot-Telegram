@@ -12,6 +12,7 @@ if (!fs.existsSync('./.tmp')) {
 
 config.logger = logger;
 
+mongoose.Promise = global.Promise;
 mongoose.connect(config.mongodb);
 var db = mongoose.connection;
 db.once('open', function() {
@@ -25,4 +26,3 @@ db.once('open', function() {
 db.on('error', function() {
     logger.error('Mongodb connection failed!');
 });
-
