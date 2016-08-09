@@ -12,9 +12,9 @@ module.exports = function(app, config) {
 
     app.post('/', function(req, res, next) {
 
-            if (req.body.type === 'pokemon') {
-                emitter.emit('pokemon', req.body.message);
-            }
+        if (req.body.type === 'pokemon') {
+            emitter.emit('pokemon', req.body.message);
+        }
 
         next();
     });
