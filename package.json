@@ -1,6 +1,6 @@
 {
   "name": "pogobot-telegram",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Telegram bot for creating and configuring notifications about nearby Pokémon",
   "main": "app.js",
   "scripts": {
