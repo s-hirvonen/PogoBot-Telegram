@@ -21,15 +21,23 @@ Commands
 `/list` - Lists Pokémon currently on your watchlist  
 `/help` - Displays this helpful list of commands
 
+Requirements
+------------
+
+* Node.js
+* MongoDB
+* [PokemonGo-Map](https://github.com/PokemonGoMap/PokemonGo-Map) instance that has webhook support enabled
+
 Installation
 ------------
 
 1. Clone this repo
 2. `npm install`
 3. Copy and rename `config.json.example` to `config.json`
-4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file.
-5. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file
-6. Start your PokemonGo-Map with webhook support (-wh flag)
+4. Get yourself a Google Maps API key. If you already have a map key for PokemonGo-Map, you can use the same key here. Put the key in the config file. For this project, also enable Google Static Maps API for that key on the [developer console](https://console.developers.google.com/apis/dashboard).
+5. Set your MongoDB path in `config.json`.
+6. Set your Telegram bot up by following [these instructions](https://core.telegram.org/bots#3-how-do-i-create-a-bot). Set your api token in the config file.
+7. Start your PokemonGo-Map with webhook support (-wh flag).
 
 Usage
 -----
@@ -43,6 +51,6 @@ Contributing
 PRs are more than welcome! Feature suggestions can also be sent as issues labeled as 'enhancement'.
 Currently planned features on my list are
 
-* Persistent watchlists
-* Full multiuser support (same bot can handle multiple users and their watchlists)
-* Cleanup procedure for deleting expired Pokémen and map images
+- [x] Persistent watchlists
+- [x] Full multiuser support (same bot can handle multiple users and their watchlists)
+- [ ] Cleanup procedure for deleting expired Pokémen and map images
