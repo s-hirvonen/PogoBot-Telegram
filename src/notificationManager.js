@@ -14,7 +14,6 @@ module.exports = function(config, bot, listener) {
 
     logger.level = 'debug';
 
-
     // Webhook receives pokemon spawn info.
     // Unfiltered at this point
     listener.on('pokemon', function(payload) {
@@ -44,17 +43,14 @@ module.exports = function(config, bot, listener) {
     });
 
     function sendPhoto(users, payload) {
-        var photoFilePath = './.tmp/' + payload.encounter_id + '.png';
-        var photo = fs.createWriteStream(photoFilePath);
-        getMap(payload.latitude, payload.longitude).pipe(photo);
-        photo.on('close', function() {
+        var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
             bot.sendPhotoNotification(
                 users,
-                photoFilePath,
+                body,
                 'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
                 'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
                 '(' + timeToDisappear(payload.disappear_time) + ' left)'
-                );
+            );
         });
     }
 
@@ -74,10 +70,10 @@ module.exports = function(config, bot, listener) {
                uri: 'https://maps.googleapis.com/maps/api/staticmap',
                qs: {
                    center: lat + ',' + lon,
-               zoom: 15,
-               size: '640x640',
-               key: config.gmap_key,
-               markers: lat + ',' + lon
+                   zoom: 15,
+                   size: '640x640',
+                   key: config.gmap_key,
+                   markers: lat + ',' + lon
                },
                callback: cb
         });
