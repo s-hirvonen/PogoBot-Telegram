@@ -30,6 +30,7 @@ module.exports = function(config, bot, listener) {
         );
 
         seen.push(payload.encounter_id);
+        logger.debug('Seen pokemon:\t %s', seen.length);
 
         // Find all users that are active and watching this pokemon
         User.find({ active: true, watchlist: Number(payload.pokemon_id) })
@@ -43,6 +44,11 @@ module.exports = function(config, bot, listener) {
             });
 
     });
+
+    setInterval(function() {
+        seen = [];
+        logger.debug('Cleared seen pokemon');
+    }, 15 * 60 * 1000);
 
     function sendPhoto(users, payload) {
         var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
