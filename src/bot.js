@@ -110,6 +110,19 @@ module.exports = function(config) {
         );
     });
 
+    // Reset command
+    // Resets the user's watchlist to the default list from config.json
+    bot.onText(/\/reset/, function(msg) {
+        logger.info('Watchlist reset request from %s', msg.from.id);
+
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
+            user.save();
+
+            bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
+        });
+    });
+
     function splitCommandArgs(str) {
         return str.split(/[\s,]/).filter(function(value) {
             return value !== '';
