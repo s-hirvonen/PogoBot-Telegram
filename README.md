@@ -19,6 +19,7 @@ Commands
 `/add pokemon [pokemon]...` - Adds Pokémon to the watchlist (space or comma separated list)  
 `/remove pokemon [pokemon]...` - Removes Pokémon from the watchlist (space or comma separated list)  
 `/list` - Lists Pokémon currently on your watchlist  
+`/reset` - Resets your watchlist to the default
 `/help` - Displays this helpful list of commands
 
 Requirements

@@ -106,6 +106,7 @@ module.exports = function(config) {
             '/add name [name2]... - Add Pokémon to the watchlist.\n' +
             '/remove name [name2]... - Remove alerts from the specified Pokémon.\n' +
             '/list - Display your watchlist.\n' +
+            '/reset - Reset your watchlist to the default.\n' +
             '/help - Display this message'
         );
     });
