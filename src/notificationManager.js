@@ -40,7 +40,10 @@ module.exports = function(config, bot, listener) {
                 var userIds = users.map(function(user) {
                     return user.telegramId;
                 });
-                sendPhoto(userIds, payload);
+
+                if (userIds.length) {
+                    sendPhoto(userIds, payload);
+                }
             });
 
     });
@@ -51,7 +54,10 @@ module.exports = function(config, bot, listener) {
     }, 15 * 60 * 1000);
 
     function sendPhoto(users, payload) {
+        logger.debug('Starting map image download...');
         var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
+
+            logger.debug('Map download complete');
 
             if (err) {
                 logger.error('Error when downloading map image:');
