@@ -106,8 +106,22 @@ module.exports = function(config) {
             '/add name [name2]... - Add Pokémon to the watchlist.\n' +
             '/remove name [name2]... - Remove alerts from the specified Pokémon.\n' +
             '/list - Display your watchlist.\n' +
+            '/reset - Reset your watchlist to the default.\n' +
             '/help - Display this message'
         );
+    });
+
+    // Reset command
+    // Resets the user's watchlist to the default list from config.json
+    bot.onText(/\/reset/, function(msg) {
+        logger.info('Watchlist reset request from %s', msg.from.id);
+
+        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+            user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
+            user.save();
+
+            bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
+        });
     });
 
     function splitCommandArgs(str) {
