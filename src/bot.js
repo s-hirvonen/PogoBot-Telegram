@@ -51,7 +51,7 @@ module.exports = function(config) {
 
     // Stop command
     bot.onText(/\/stop/, function(msg, match) {
-        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             user.active = false;
             user.save();
             logger.info('User %s is now inactive', user.telegramId);
@@ -62,7 +62,7 @@ module.exports = function(config) {
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
     bot.onText(/\/add (.+)/, function(msg, match) {
-        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             var toAdd = splitCommandArgs(match[1]);
             var toAddIds = Pokedex.getPokemonIdsByNames(toAdd);
 
@@ -76,7 +76,7 @@ module.exports = function(config) {
     // Remove command
     // Accepts a space or comma-separated list of Pokemen to unwatch
     bot.onText(/\/remove (.+)/, function(msg, match) {
-        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             var toRemove = splitCommandArgs(match[1]);
             var toRemoveIds = Pokedex.getPokemonIdsByNames(toRemove);
 
@@ -91,7 +91,7 @@ module.exports = function(config) {
     // List command
     // Lists all the pokemen currently on the watchlist
     bot.onText(/\/list/, function(msg) {
-        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
         });
     });
@@ -116,7 +116,7 @@ module.exports = function(config) {
     bot.onText(/\/reset/, function(msg) {
         logger.info('Watchlist reset request from %s', msg.from.id);
 
-        User.findOne({ telegramId: msg.from.id }, function(err, user) {
+        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
             user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
             user.save();
 
