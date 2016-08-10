@@ -1,7 +1,8 @@
 PogoBot-Telegram
 ================
 
-Configurable PokemonGo-Map alerts via Telegram.
+Configurable PokemonGo-Map alerts via Telegram.  
+**Check the develop branch for the most recent updates**
 
 <img src=http://i.imgur.com/7zscpP7.png width=30% height=30%>
 
@@ -53,4 +54,5 @@ Currently planned features on my list are
 
 - [x] Persistent watchlists
 - [x] Full multiuser support (same bot can handle multiple users and their watchlists)
-- [ ] Cleanup procedure for deleting expired Pokémen and map images
+- [x] Cleanup procedure for deleting expired Pokémen and map images
+- [ ] Test and document installation on Windows
