@@ -2,6 +2,7 @@
 
 var fs = require('fs'),
     moment = require('moment'),
+    _ = require('lodash'),
     request = require('request').defaults({ encoding: null }),
     User = require('./user');
 
@@ -22,28 +23,48 @@ module.exports = function(config, bot, listener) {
             return;
         }
 
-        logger.info(
-            'A wild %s appeared! Disappear time %s',
-            pokemon[payload.pokemon_id],
-            payload.disappear_time
-        );
 
         seen.push(payload.encounter_id);
 
         // Find all users that are active and watching this pokemon
-        var query = User.find({ active: true, watchlist: Number(payload.pokemon_id) });
+        User.find({ active: true, watchlist: Number(payload.pokemon_id) })
+            .then(function(users) {
+                logger.info(
+                    'Wild %s appeared!\t Disappear time %s\t Users watching %s\t Seen pokemon %s',
+                    pokemon[payload.pokemon_id],
+                    payload.disappear_time,
+                    _.map(users, 'telegramId'),
+                    seen.length
+                );
 
-        query.then(function(users) {
-            var userIds = users.map(function(user) {
-                return user.telegramId;
+                var userIds = users.map(function(user) {
+                    return user.telegramId;
+                });
+                sendPhoto(userIds, payload);
             });
-            sendPhoto(userIds, payload);
-        });
 
     });
 
+    setInterval(function() {
+        seen = [];
+        logger.debug('Cleared seen pokemon');
+    }, 15 * 60 * 1000);
+
     function sendPhoto(users, payload) {
         var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
+
+            if (err) {
+                logger.error('Error when downloading map image:');
+                logger.error(err);
+                return;
+            }
+
+            if (res.statusCode !== 200) {
+                logger.error('Request failed with code %s', res.statusCode);
+                logger.error('Make sure you have Static Maps API enabled on your key.');
+                throw new Error('Failed to get map image from Google Maps API.');
+            }
+
             bot.sendPhotoNotification(
                 users,
                 body,
@@ -60,8 +81,7 @@ module.exports = function(config, bot, listener) {
     }
 
     function disappearTime(timestamp) {
-        var time = moment.unix(timestamp);
-        return [time.hour(), time.minutes(), time.seconds()].join(':');
+        return moment.unix(timestamp).format('HH:mm:ss');
     }
 
     function getMap(lat, lon, cb) {
