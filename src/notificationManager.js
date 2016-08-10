@@ -53,6 +53,12 @@ module.exports = function(config, bot, listener) {
     function sendPhoto(users, payload) {
         var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
 
+            if (err) {
+                logger.error('Error when downloading map image:');
+                logger.error(err);
+                return;
+            }
+
             if (res.statusCode !== 200) {
                 logger.error('Request failed with code %s', res.statusCode);
                 logger.error('Make sure you have Static Maps API enabled on your key.');
