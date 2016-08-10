@@ -23,19 +23,19 @@ module.exports = function(config, bot, listener) {
             return;
         }
 
-        logger.info(
-            'A wild %s appeared!\t Disappear time %s',
-            pokemon[payload.pokemon_id],
-            payload.disappear_time
-        );
 
         seen.push(payload.encounter_id);
-        logger.debug('Seen pokemon:\t %s', seen.length);
 
         // Find all users that are active and watching this pokemon
         User.find({ active: true, watchlist: Number(payload.pokemon_id) })
             .then(function(users) {
-                logger.debug('Users watching this Pokemon: %s', _.map(users, 'telegramId'));
+                logger.info(
+                    'Wild %s appeared!\t Disappear time %s\t Users watching %s\t Seen pokemon %s',
+                    pokemon[payload.pokemon_id],
+                    payload.disappear_time,
+                    _.map(users, 'telegramId'),
+                    seen.length
+                );
 
                 var userIds = users.map(function(user) {
                     return user.telegramId;
