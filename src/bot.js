@@ -4,12 +4,12 @@ var TelegramBot = require('node-telegram-bot-api'),
     logger = require('winston'),
     _ = require('lodash'),
     fs = require('fs'),
-    User = require('./user.js');
+    User = require('./user.js'),
+    Pokedex = require('./pokedex');
 
 module.exports = function(config) {
 
     var bot = new TelegramBot(config.api_token, {polling: true});
-    var pokedex = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
     var pokemon = config.watchlist;
     var exports = {};
 
@@ -40,12 +40,9 @@ module.exports = function(config) {
             if (created) {
                 logger.info('Created new user with id %s', user.telegramId);
                 // New users start with the default watchlist
-                user.watchlist = getPokemonIdsByNames(config.watchlist);
+                user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
             }
 
-            user.active = true;
-
-            user.save();
             logger.info('User %s is now active', user.telegramId);
         });
 
@@ -67,7 +64,7 @@ module.exports = function(config) {
     bot.onText(/\/add (.+)/, function(msg, match) {
         User.findOne({ telegramId: msg.from.id }, function(err, user) {
             var toAdd = splitCommandArgs(match[1]);
-            var toAddIds = getPokemonIdsByNames(toAdd);
+            var toAddIds = Pokedex.getPokemonIdsByNames(toAdd);
 
             user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
                 return a - b;
@@ -81,7 +78,7 @@ module.exports = function(config) {
     bot.onText(/\/remove (.+)/, function(msg, match) {
         User.findOne({ telegramId: msg.from.id }, function(err, user) {
             var toRemove = splitCommandArgs(match[1]);
-            var toRemoveIds = getPokemonIdsByNames(toRemove);
+            var toRemoveIds = Pokedex.getPokemonIdsByNames(toRemove);
 
             user.watchlist = user.watchlist.filter(function(number) {
                 return toRemoveIds.indexOf(number) === -1;
@@ -113,20 +110,6 @@ module.exports = function(config) {
         );
     });
 
-    // Receives an array and returns the pokedex numbers of the given pokemen
-    // If a given pokemon name doesn't exist, it is ignored.
-    function getPokemonIdsByNames(names) {
-        return names.map(function(name) {
-            return _.findKey(pokedex, function(p) {
-                return p === name;
-            });
-        }).filter(function(p) {
-            return p !== undefined;
-        }).map(function(p) {
-            return Number(p);
-        });
-    }
-
     function splitCommandArgs(str) {
         return str.split(/[\s,]/).filter(function(value) {
             return value !== '';
@@ -135,7 +118,7 @@ module.exports = function(config) {
 
     function printWatchlist(list) {
         var names = list.map(function(number) {
-            return pokedex[number];
+            return Pokedex.pokedex[number];
         });
 
         return 'Pokémon on your watchlist:\n\n' + names.join('\n');

@@ -2,6 +2,7 @@
 
 var fs = require('fs'),
     moment = require('moment'),
+    _ = require('lodash'),
     request = require('request').defaults({ encoding: null }),
     User = require('./user');
 
@@ -23,7 +24,7 @@ module.exports = function(config, bot, listener) {
         }
 
         logger.info(
-            'A wild %s appeared! Disappear time %s',
+            'A wild %s appeared!\t Disappear time %s',
             pokemon[payload.pokemon_id],
             payload.disappear_time
         );
@@ -31,14 +32,15 @@ module.exports = function(config, bot, listener) {
         seen.push(payload.encounter_id);
 
         // Find all users that are active and watching this pokemon
-        var query = User.find({ active: true, watchlist: Number(payload.pokemon_id) });
+        User.find({ active: true, watchlist: Number(payload.pokemon_id) })
+            .then(function(users) {
+                logger.debug('Users watching this Pokemon: %s', _.map(users, 'telegramId'));
 
-        query.then(function(users) {
-            var userIds = users.map(function(user) {
-                return user.telegramId;
+                var userIds = users.map(function(user) {
+                    return user.telegramId;
+                });
+                sendPhoto(userIds, payload);
             });
-            sendPhoto(userIds, payload);
-        });
 
     });
 
