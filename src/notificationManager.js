@@ -11,7 +11,7 @@ module.exports = function(config, bot, listener) {
     var logger = config.logger;
 
     var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
-    var seen = []; // Contains encounter ids of already processed pokemen
+    var seen = []; // Contains encounter data of already processed pokemen
 
     logger.level = 'debug';
 
@@ -19,12 +19,20 @@ module.exports = function(config, bot, listener) {
     // Unfiltered at this point
     listener.on('pokemon', function(payload) {
 
-        if (seen.indexOf(payload.encounter_id) !== -1) {
+        // Webhook gave us an expired pokemon. It happens, just ignore
+        if (moment().unix() > payload.disappear_time) {
             return;
         }
 
+        // We have seen this pokemon
+        if (_.find(seen, { disappear: payload.disappear_time}) !== undefined) {
+            return;
+        }
 
-        seen.push(payload.encounter_id);
+        seen.push({
+            id: payload.encounter_id,
+            disappear: payload.disappear_time
+        });
 
         // Find all users that are active and watching this pokemon
         User.find({ active: true, watchlist: Number(payload.pokemon_id) })
@@ -49,8 +57,10 @@ module.exports = function(config, bot, listener) {
     });
 
     setInterval(function() {
-        seen = [];
-        logger.debug('Cleared seen pokemon');
+        seen = _.filter(seen, function(encounter) {
+            return endounter.disappear > moment().unix();
+        });
+        logger.debug('Cleared seen and expired pokemon');
     }, 15 * 60 * 1000);
 
     function sendPhoto(users, payload) {
