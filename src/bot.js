@@ -42,6 +42,10 @@ module.exports = function(config) {
                 // New users start with the default watchlist
                 user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
             }
+            else {
+                user.active = true;
+                user.save();
+            }
 
             logger.info('User %s is now active', user.telegramId);
         });
