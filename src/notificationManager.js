@@ -96,8 +96,8 @@ module.exports = function(config, bot, listener) {
                uri: 'https://maps.googleapis.com/maps/api/staticmap',
                qs: {
                    center: lat + ',' + lon,
-                   zoom: 15,
-                   size: '640x640',
+                   zoom: 16,
+                   size: '1080x1080',
                    key: config.gmap_key,
                    markers: lat + ',' + lon
                },
