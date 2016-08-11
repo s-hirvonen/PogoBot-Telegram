@@ -24,10 +24,17 @@ module.exports = function(config) {
         }
     };
 
-    exports.sendPhotoNotification = function(users, photo, caption) {
+    exports.sendPhotoNotification = function(users, photo, caption, coords) {
         _.forEach(users, function(user) {
-            bot.sendPhoto(user, photo, {
-                caption: caption
+            bot.sendPhoto(user, photo).then(function() {
+            bot.sendMessage(user, caption, {
+                reply_markup: {
+                    inline_keyboard: [[{
+                        text: 'Get directions',
+                        url: 'https://google.com/maps/dir//' + coords.join(',')
+                    }]]
+                }
+            });
             });
         });
     };

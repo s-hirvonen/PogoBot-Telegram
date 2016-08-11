@@ -55,7 +55,7 @@ module.exports = function(config, bot, listener) {
 
     function sendPhoto(users, payload) {
         logger.debug('Starting map image download...');
-        var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
+        getMap(payload.latitude, payload.longitude, function(err, res, photo) {
 
             logger.debug('Map download complete');
 
@@ -65,6 +65,8 @@ module.exports = function(config, bot, listener) {
                 return;
             }
 
+            logger.debug(payload);
+
             if (res.statusCode !== 200) {
                 logger.error('Request failed with code %s', res.statusCode);
                 logger.error('Make sure you have Static Maps API enabled on your key.');
@@ -73,10 +75,11 @@ module.exports = function(config, bot, listener) {
 
             bot.sendPhotoNotification(
                 users,
-                body,
+                photo,
                 'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
                 'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
-                '(' + timeToDisappear(payload.disappear_time) + ' left)'
+                '(' + timeToDisappear(payload.disappear_time) + ' left)',
+                [payload.latitude, payload.longitude]
             );
         });
     }
