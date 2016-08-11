@@ -58,7 +58,7 @@ module.exports = function(config, bot, listener) {
 
     setInterval(function() {
         seen = _.filter(seen, function(encounter) {
-            return endounter.disappear > moment().unix();
+            return encounter.disappear > moment().unix();
         });
         logger.debug('Cleared seen and expired pokemon');
     }, 15 * 60 * 1000);
