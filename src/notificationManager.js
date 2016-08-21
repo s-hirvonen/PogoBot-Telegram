@@ -25,7 +25,12 @@ module.exports = function(config, bot, listener) {
         }
 
         // We have seen this pokemon
-        if (_.find(seen, { disappear: payload.disappear_time}) !== undefined) {
+        if (_.find(seen, { id: payload.encounter_id}) !== undefined) {
+            logger.debug(
+                'Ignoring duplicate encounter of %s\t encounter_id %s',
+                pokemon[payload.pokemon_id],
+                payload.encounter_id
+            );
             return;
         }
 
