@@ -24,80 +24,86 @@ module.exports = function(config) {
         }
     };
 
-    exports.sendPhotoNotification = function(users, photo, caption) {
+    exports.sendPhotoNotification = function(users, photo, caption, coords) {
         _.forEach(users, function(user) {
-            bot.sendPhoto(user, photo, {
-                caption: caption
+            bot.sendPhoto(user, photo).then(function() {
+            bot.sendMessage(user, caption, {
+                reply_markup: {
+                    inline_keyboard: [[{
+                        text: 'Get directions',
+                        url: 'https://google.com/maps/dir//' + coords.join(',')
+                    }]]
+                }
+            });
             });
         });
     };
 
     // -----------------------------------------------------------------------
+    bot.onCommand = function(pattern, callback) {
+        bot.onText(pattern, function(msg, match) {
+            User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
+                if (err) {
+                    logger.error(err);
+                    return;
+                }
+                callback(msg, match, user, created);
+            });
+        });
+    };
 
     // Start command
-    bot.onText(/\/start/, function(msg, match) {
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            if (created) {
-                logger.info('Created new user with id %s', user.telegramId);
-                // New users start with the default watchlist
-                user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
-            }
-            else {
-                user.active = true;
-                user.save();
-            }
+    bot.onCommand(/\/start/, function(msg, match, user, created) {
+        if (created) {
+            logger.info('Created new user with id %s', user.telegramId);
+            // New users start with the default watchlist
+            user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
+        } else {
+            user.active = true;
+            user.save();
+        }
 
-            logger.info('User %s is now active', user.telegramId);
-        });
-
+        logger.info('User %s is now active', user.telegramId);
         bot.sendMessage(msg.from.id, 'Bot activated! Type /stop to stop.');
     });
 
     // Stop command
-    bot.onText(/\/stop/, function(msg, match) {
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            user.active = false;
-            user.save();
-            logger.info('User %s is now inactive', user.telegramId);
-            bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
-        });
+    bot.onCommand(/\/stop/, function(msg, match, user, created) {
+        user.active = false;
+        user.save();
+        logger.info('User %s is now inactive', user.telegramId);
+        bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
     });
 
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
-    bot.onText(/\/add (.+)/, function(msg, match) {
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            var toAdd = splitCommandArgs(match[1]);
-            var toAddIds = Pokedex.getPokemonIdsByNames(toAdd);
+    bot.onCommand(/\/add (.+)/, function(msg, match, user, created) {
+        var toAdd = splitCommandArgs(match[1]);
+        var toAddIds = Pokedex.getPokemonIdsByNames(toAdd);
 
-            user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
-                return a - b;
-            });
-            user.save();
+        user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
+            return a - b;
         });
+        user.save();
     });
 
     // Remove command
     // Accepts a space or comma-separated list of Pokemen to unwatch
-    bot.onText(/\/remove (.+)/, function(msg, match) {
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            var toRemove = splitCommandArgs(match[1]);
-            var toRemoveIds = Pokedex.getPokemonIdsByNames(toRemove);
+    bot.onCommand(/\/remove (.+)/, function(msg, match, user, created) {
+        var toRemove = splitCommandArgs(match[1]);
+        var toRemoveIds = Pokedex.getPokemonIdsByNames(toRemove);
 
-            user.watchlist = user.watchlist.filter(function(number) {
-                return toRemoveIds.indexOf(number) === -1;
-            });
-
-            user.save();
+        user.watchlist = user.watchlist.filter(function(number) {
+            return toRemoveIds.indexOf(number) === -1;
         });
+
+        user.save();
     });
 
     // List command
     // Lists all the pokemen currently on the watchlist
-    bot.onText(/\/list/, function(msg) {
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
-        });
+    bot.onCommand(/\/list/, function(msg, match, user, created) {
+        bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
     });
 
     // Help command
@@ -117,15 +123,11 @@ module.exports = function(config) {
 
     // Reset command
     // Resets the user's watchlist to the default list from config.json
-    bot.onText(/\/reset/, function(msg) {
+    bot.onCommand(/\/reset/, function(msg, match, user, created) {
         logger.info('Watchlist reset request from %s', msg.from.id);
-
-        User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-            user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
-            user.save();
-
-            bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
-        });
+        user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
+        user.save();
+        bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
     });
 
     function splitCommandArgs(str) {

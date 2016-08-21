@@ -11,7 +11,7 @@ module.exports = function(config, bot, listener) {
     var logger = config.logger;
 
     var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
-    var seen = []; // Contains encounter ids of already processed pokemen
+    var seen = []; // Contains encounter data of already processed pokemen
 
     logger.level = 'debug';
 
@@ -19,12 +19,25 @@ module.exports = function(config, bot, listener) {
     // Unfiltered at this point
     listener.on('pokemon', function(payload) {
 
-        if (seen.indexOf(payload.encounter_id) !== -1) {
+        // Webhook gave us an expired pokemon. It happens, just ignore
+        if (moment().unix() > payload.disappear_time) {
             return;
         }
 
+        // We have seen this pokemon
+        if (_.find(seen, { id: payload.encounter_id}) !== undefined) {
+            logger.debug(
+                'Ignoring duplicate encounter of %s\t encounter_id %s',
+                pokemon[payload.pokemon_id],
+                payload.encounter_id
+            );
+            return;
+        }
 
-        seen.push(payload.encounter_id);
+        seen.push({
+            id: payload.encounter_id,
+            disappear: payload.disappear_time
+        });
 
         // Find all users that are active and watching this pokemon
         User.find({ active: true, watchlist: Number(payload.pokemon_id) })
@@ -49,13 +62,15 @@ module.exports = function(config, bot, listener) {
     });
 
     setInterval(function() {
-        seen = [];
-        logger.debug('Cleared seen pokemon');
+        seen = _.filter(seen, function(encounter) {
+            return encounter.disappear > moment().unix();
+        });
+        logger.debug('Cleared seen and expired pokemon');
     }, 15 * 60 * 1000);
 
     function sendPhoto(users, payload) {
         logger.debug('Starting map image download...');
-        var photo = getMap(payload.latitude, payload.longitude, function(err, res, body) {
+        getMap(payload.latitude, payload.longitude, function(err, res, photo) {
 
             logger.debug('Map download complete');
 
@@ -65,6 +80,8 @@ module.exports = function(config, bot, listener) {
                 return;
             }
 
+            logger.debug(payload);
+
             if (res.statusCode !== 200) {
                 logger.error('Request failed with code %s', res.statusCode);
                 logger.error('Make sure you have Static Maps API enabled on your key.');
@@ -73,10 +90,11 @@ module.exports = function(config, bot, listener) {
 
             bot.sendPhotoNotification(
                 users,
-                body,
+                photo,
                 'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
-                'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
-                '(' + timeToDisappear(payload.disappear_time) + ' left)'
+                timeToDisappear(payload.disappear_time) + ' left, ' +
+                'disappears at ' + disappearTime(payload.disappear_time) + '\n',
+                [payload.latitude, payload.longitude]
             );
         });
     }
