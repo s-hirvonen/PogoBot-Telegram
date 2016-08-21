@@ -92,8 +92,8 @@ module.exports = function(config, bot, listener) {
                 users,
                 photo,
                 'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
-                'Disappears at ' + disappearTime(payload.disappear_time) + '\n' +
-                '(' + timeToDisappear(payload.disappear_time) + ' left)',
+                timeToDisappear(payload.disappear_time) + ' left, ' +
+                'disappears at ' + disappearTime(payload.disappear_time) + '\n',
                 [payload.latitude, payload.longitude]
             );
         });
