@@ -11,13 +11,13 @@ module.exports = function(app, config) {
 
     app.use(jsonParser);
 
-    app.post('/', function(req, res, next) {
+    app.post('/', function(req, res) {
 
         if (req.body.type === 'pokemon') {
             emitter.emit('pokemon', req.body.message);
         }
 
-        next();
+        res.status(200).send();
     });
 
     app.listen(config.port, function() {
