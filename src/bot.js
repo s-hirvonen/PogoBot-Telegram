@@ -103,9 +103,15 @@ module.exports = function(config) {
     });
 
     // List command
-    // Lists all the pokemen currently on the watchlist
+    // Lists all the pokémon currently on the watchlist
     bot.onCommand(/\/list/, function(msg, match, user, created) {
         bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
+    });
+
+    // Pokedex command
+    // Lists all known pokémon
+    bot.onCommand(/\/pokedex/, function(msg, match, user, created) {
+        bot.sendMessage(msg.from.id, printPokemonList(Pokedex.pokedex));
     });
 
     // Help command
@@ -118,6 +124,7 @@ module.exports = function(config) {
             '/add name [name2]... - Add Pokémon to the watchlist.\n' +
             '/remove name [name2]... - Remove alerts from the specified Pokémon.\n' +
             '/list - Display your watchlist.\n' +
+            '/pokedex - List all known Pokémon.\n' +
             '/reset - Reset your watchlist to the default.\n' +
             '/help - Display this message'
         );
@@ -144,6 +151,15 @@ module.exports = function(config) {
         });
 
         return 'Pokémon on your watchlist:\n\n' + names.join('\n');
+    }
+
+    function printPokemonList(list) {
+        var names = [];
+        _.forEach(list, function(name, number) {
+            names.push(number + ') ' + name);
+        });
+
+        return 'All known Pokémon:\n\n' + names.join('\n');
     }
 
     return exports;
