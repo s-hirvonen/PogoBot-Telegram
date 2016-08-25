@@ -11,7 +11,7 @@ exports.pokedex = pokedex;
 exports.getPokemonIdsByNames = function(names) {
     return names.map(function(name) {
         return _.findKey(pokedex, function(p) {
-            return p === name;
+            return p.toLowerCase() === name.toLowerCase();
         });
     }).filter(function(p) {
         return p !== undefined;
