@@ -6,13 +6,17 @@ var fs = require('fs'),
 
 exports.pokedex = pokedex;
 
+exports.getPokemonIdByName = function(name) {
+    return _.findKey(pokedex, function(p) {
+        return p === name;
+    });
+};
+
 // Receives an array and returns the pokedex numbers of the given pokemen
 // If a given pokemon name doesn't exist, it is ignored.
 exports.getPokemonIdsByNames = function(names) {
     return names.map(function(name) {
-        return _.findKey(pokedex, function(p) {
-            return p === name;
-        });
+        return exports.getPokemonIdByName(name);
     }).filter(function(p) {
         return p !== undefined;
     }).map(function(p) {

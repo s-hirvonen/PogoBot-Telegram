@@ -78,8 +78,7 @@ module.exports = function(config) {
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
     bot.onCommand(/\/add (.+)/, function(msg, match, user, created) {
-        var toAdd = splitCommandArgs(match[1]);
-        var toAddIds = Pokedex.getPokemonIdsByNames(toAdd);
+        var toAddIds = getPokemonFromArguments(match[1]);
 
         user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
             return a - b;
@@ -90,8 +89,7 @@ module.exports = function(config) {
     // Remove command
     // Accepts a space or comma-separated list of Pokemen to unwatch
     bot.onCommand(/\/remove (.+)/, function(msg, match, user, created) {
-        var toRemove = splitCommandArgs(match[1]);
-        var toRemoveIds = Pokedex.getPokemonIdsByNames(toRemove);
+        var toRemoveIds = getPokemonFromArguments(match[1]);
 
         user.watchlist = user.watchlist.filter(function(number) {
             return toRemoveIds.indexOf(number) === -1;
@@ -130,10 +128,25 @@ module.exports = function(config) {
         bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
     });
 
-    function splitCommandArgs(str) {
-        return str.split(/[\s,]/).filter(function(value) {
+    function getPokemonFromArguments(str) {
+        var args = str.split(/[\s,]/).filter(function(value) {
             return value !== '';
         });
+
+        var ids = [];
+
+        args.map(function(pokemon) {
+            if (!isNaN(Number(pokemon))) {
+                // Pokedex number passed
+                ids.push(Number(pokemon));
+            } else {
+                // Pokémon name passed
+                var id = Number(Pokedex.getPokemonIdByName(pokemon));
+                if (id !== NaN) ids.push(id);
+            }
+        });
+
+        return ids;
     }
 
     function printWatchlist(list) {
