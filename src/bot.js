@@ -78,7 +78,9 @@ module.exports = function(config) {
     // Add command
     // Accepts a space or comma-separated list of Pokemen to watch
     bot.onCommand(/\/add (.+)/, function(msg, match, user, created) {
-        var toAddIds = getPokemonFromArguments(match[1]);
+        var toAddIds = getPokemonFromArguments(match[1]).filter(function(item) {
+            return user.watchlist.indexOf(item) === -1;
+        });
 
         user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
             return a - b;

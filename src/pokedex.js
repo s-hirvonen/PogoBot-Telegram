@@ -8,7 +8,7 @@ exports.pokedex = pokedex;
 
 exports.getPokemonIdByName = function(name) {
     return _.findKey(pokedex, function(p) {
-        return p === name;
+        return p.toLowerCase() === name.toLowerCase();
     });
 };
 
