@@ -101,7 +101,7 @@ module.exports = function(config, bot, listener) {
 
     function timeToDisappear(timestamp) {
         var diff = moment.unix(timestamp).diff(moment());
-        return moment.duration(diff).humanize();
+        return moment.utc(moment.duration(diff).asMilliseconds()).format("m[m] ss[s]");
     }
 
     function disappearTime(timestamp) {
