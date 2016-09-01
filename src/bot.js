@@ -37,6 +37,17 @@ module.exports = function(config) {
             });
             });
         });
+    }
+
+    exports.sendNotification = function(users, caption, coords) {
+        users.map(function(user) {
+            bot.sendMessage(user, caption)
+            .then(function() {
+                return bot.sendLocation(user, coords[0], coords[1], {
+                    disable_notification: true
+                });
+            });
+        });
     };
 
     // -----------------------------------------------------------------------
