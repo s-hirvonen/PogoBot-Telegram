@@ -55,7 +55,13 @@ module.exports = function(config, bot, listener) {
                 });
 
                 if (userIds.length) {
-                    sendPhoto(userIds, payload);
+                    bot.sendNotification(
+                        userIds,
+                        'A wild ' + pokemon[payload.pokemon_id] + ' appeared!\n' +
+                        timeToDisappear(payload.disappear_time) + ' left, ' +
+                        'disappears at ' + disappearTime(payload.disappear_time) + '\n',
+                        [payload.latitude, payload.longitude]
+                    );
                 }
             });
 
