@@ -88,12 +88,6 @@ module.exports = function(config) {
         bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
     });
 
-    // List command
-    // Lists all the pokémon currently on the watchlist
-    bot.onCommand(/\/list/, function(msg, match, user, created) {
-        bot.sendMessage(msg.from.id, printWatchlist(user.watchlist));
-    });
-
     // Pokedex command
     // Lists all known pokémon
     bot.onCommand(/\/pokedex/, function(msg, match, user, created) {
@@ -115,23 +109,6 @@ module.exports = function(config) {
             '/help - Display this message'
         );
     });
-
-    // Reset command
-    // Resets the user's watchlist to the default list from config.json
-    bot.onCommand(/\/reset/, function(msg, match, user, created) {
-        logger.info('Watchlist reset request from %s', msg.from.id);
-        user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
-        user.save();
-        bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
-    });
-
-    function printWatchlist(list) {
-        var names = list.map(function(number) {
-            return Pokedex.pokedex[number];
-        });
-
-        return 'Pokémon on your watchlist:\n\n' + names.join('\n');
-    }
 
     function printPokemonList(list) {
         var names = [];

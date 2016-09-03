@@ -1,5 +1,8 @@
 'use strict';
 
 module.exports = [
-    require('./add')
+    require('./add'),
+    require('./remove'),
+    require('./reset'),
+    require('./list')
 ];

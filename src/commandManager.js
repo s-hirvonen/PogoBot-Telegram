@@ -16,7 +16,11 @@ module.exports = function(config, bot) {
                     logger.error(err);
                     return;
                 }
-                callback(msg, match, user, created);
+                var replyMessage = callback(msg, match, user, created);
+
+                if (replyMessage) {
+                    bot.sendMessage(msg.from.id, replyMessage);
+                }
             });
         });
     }
