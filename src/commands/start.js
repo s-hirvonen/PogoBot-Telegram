@@ -19,7 +19,9 @@ module.exports = {
     description: '/start - Start the bot',
 
     /** Is the command listed in Telegram's command list? */
-    list: false,
+    list: function(user) {
+        return user.active === false;
+    },
 
     /**
      * Callback to execute when a user executes the command.
