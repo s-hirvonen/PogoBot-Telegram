@@ -23,3 +23,24 @@ exports.getPokemonIdsByNames = function(names) {
         return Number(p);
     });
 };
+
+exports.getPokemonIdsFromArgumentString = function (str) {
+    var args = str.split(/[\s,]/).filter(function(value) {
+        return value !== '';
+    });
+
+    var ids = [];
+
+    args.map(function(pokemon) {
+        if (!isNaN(Number(pokemon))) {
+            // Pokedex number passed
+            ids.push(Number(pokemon));
+        } else {
+            // Pokémon name passed
+            var id = Number(exports.getPokemonIdByName(pokemon));
+            if (id !== NaN) ids.push(id);
+        }
+    });
+
+    return ids;
+};

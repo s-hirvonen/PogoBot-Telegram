@@ -10,6 +10,7 @@ var TelegramBot = require('node-telegram-bot-api'),
 module.exports = function(config) {
 
     var bot = new TelegramBot(config.api_token, {polling: true});
+    var commandManager = require('./commandManager')(config, bot);
     var pokemon = config.watchlist;
     var exports = {};
 
@@ -38,6 +39,7 @@ module.exports = function(config) {
             });
         });
     };
+
 
     // -----------------------------------------------------------------------
     bot.onCommand = function(pattern, callback) {
@@ -75,23 +77,10 @@ module.exports = function(config) {
         bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
     });
 
-    // Add command
-    // Accepts a space or comma-separated list of Pokemen to watch
-    bot.onCommand(/\/add (.+)/, function(msg, match, user, created) {
-        var toAddIds = getPokemonFromArguments(match[1]).filter(function(item) {
-            return user.watchlist.indexOf(item) === -1;
-        });
-
-        user.watchlist = user.watchlist.concat(toAddIds).sort(function(a, b) {
-            return a - b;
-        });
-        user.save();
-    });
-
     // Remove command
     // Accepts a space or comma-separated list of Pokemen to unwatch
     bot.onCommand(/\/remove (.+)/, function(msg, match, user, created) {
-        var toRemoveIds = getPokemonFromArguments(match[1]);
+        var toRemoveIds = pokedex.getPokemonIdsFromArgumentString(match[1]);
 
         user.watchlist = user.watchlist.filter(function(number) {
             return toRemoveIds.indexOf(number) === -1;
@@ -136,27 +125,6 @@ module.exports = function(config) {
         user.save();
         bot.sendMessage( msg.from.id, 'Watchlist reset complete!');
     });
-
-    function getPokemonFromArguments(str) {
-        var args = str.split(/[\s,]/).filter(function(value) {
-            return value !== '';
-        });
-
-        var ids = [];
-
-        args.map(function(pokemon) {
-            if (!isNaN(Number(pokemon))) {
-                // Pokedex number passed
-                ids.push(Number(pokemon));
-            } else {
-                // Pokémon name passed
-                var id = Number(Pokedex.getPokemonIdByName(pokemon));
-                if (id !== NaN) ids.push(id);
-            }
-        });
-
-        return ids;
-    }
 
     function printWatchlist(list) {
         var names = list.map(function(number) {
