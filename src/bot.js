@@ -88,12 +88,6 @@ module.exports = function(config) {
         bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
     });
 
-    // Pokedex command
-    // Lists all known pokémon
-    bot.onCommand(/\/pokedex/, function(msg, match, user, created) {
-        bot.sendMessage(msg.from.id, printPokemonList(Pokedex.pokedex));
-    });
-
     // Help command
     // Lists all the available commands
     bot.onText(/\/help/, function(msg) {
@@ -109,15 +103,6 @@ module.exports = function(config) {
             '/help - Display this message'
         );
     });
-
-    function printPokemonList(list) {
-        var names = [];
-        _.forEach(list, function(name, number) {
-            names.push(number + ') ' + name);
-        });
-
-        return 'All known Pokémon:\n\n' + names.join('\n');
-    }
 
     return exports;
 }
