@@ -6,6 +6,8 @@ module.exports = {
 
     pattern: /\/add (.+)/,
 
+    description: '/add name [name]... - Adds Pokémon to the watchlist',
+
     list: false,
 
     callback: function(msg, match, user, created) {

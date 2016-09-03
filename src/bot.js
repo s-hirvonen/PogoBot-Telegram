@@ -77,18 +77,6 @@ module.exports = function(config) {
         bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
     });
 
-    // Remove command
-    // Accepts a space or comma-separated list of Pokemen to unwatch
-    bot.onCommand(/\/remove (.+)/, function(msg, match, user, created) {
-        var toRemoveIds = pokedex.getPokemonIdsFromArgumentString(match[1]);
-
-        user.watchlist = user.watchlist.filter(function(number) {
-            return toRemoveIds.indexOf(number) === -1;
-        });
-
-        user.save();
-    });
-
     // List command
     // Lists all the pokémon currently on the watchlist
     bot.onCommand(/\/list/, function(msg, match, user, created) {
