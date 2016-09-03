@@ -6,7 +6,7 @@ module.exports = {
 
     pattern: /\/reset/,
 
-    description: '/reset - Reset your watchlist to the default.\n',
+    description: '/reset - Reset your watchlist to the default.',
 
     list: true,
 

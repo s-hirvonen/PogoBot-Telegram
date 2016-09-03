@@ -2,10 +2,7 @@
 
 var TelegramBot = require('node-telegram-bot-api'),
     logger = require('winston'),
-    _ = require('lodash'),
-    fs = require('fs'),
-    User = require('./user.js'),
-    Pokedex = require('./pokedex');
+    _ = require('lodash');
 
 module.exports = function(config) {
 
@@ -50,59 +47,6 @@ module.exports = function(config) {
             });
         });
     };
-
-
-    // -----------------------------------------------------------------------
-    bot.onCommand = function(pattern, callback) {
-        bot.onText(pattern, function(msg, match) {
-            User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
-                if (err) {
-                    logger.error(err);
-                    return;
-                }
-                callback(msg, match, user, created);
-            });
-        });
-    };
-
-    // Start command
-    bot.onCommand(/\/start/, function(msg, match, user, created) {
-        if (created) {
-            logger.info('Created new user with id %s', user.telegramId);
-            // New users start with the default watchlist
-            user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
-        } else {
-            user.active = true;
-            user.save();
-        }
-
-        logger.info('User %s is now active', user.telegramId);
-        bot.sendMessage(msg.from.id, 'Bot activated! Type /stop to stop.');
-    });
-
-    // Stop command
-    bot.onCommand(/\/stop/, function(msg, match, user, created) {
-        user.active = false;
-        user.save();
-        logger.info('User %s is now inactive', user.telegramId);
-        bot.sendMessage(msg.from.id, 'Bot stopped. /start again later!');
-    });
-
-    // Help command
-    // Lists all the available commands
-    bot.onText(/\/help/, function(msg) {
-        bot.sendMessage(
-            msg.from.id,
-            'Hello! I am PogoBot, and alert you of nearby Pokémon!\n\n' +
-            'The following commands are available to you:\n' +
-            '/add name [name2]... - Add Pokémon to the watchlist.\n' +
-            '/remove name [name2]... - Remove alerts from the specified Pokémon.\n' +
-            '/list - Display your watchlist.\n' +
-            '/pokedex - List all known Pokémon.\n' +
-            '/reset - Reset your watchlist to the default.\n' +
-            '/help - Display this message'
-        );
-    });
 
     return exports;
 }

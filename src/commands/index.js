@@ -5,5 +5,7 @@ module.exports = [
     require('./remove'),
     require('./reset'),
     require('./list'),
-    require('./pokedex')
+    require('./pokedex'),
+    require('./start'),
+    require('./stop')
 ];
