@@ -9,6 +9,9 @@ var pokedex = require('../pokedex'),
  */
 module.exports = {
 
+    /** Command name */
+    name: '/stop',
+
     /** Command regex pattern */
     pattern: /\/stop/,
 
@@ -16,7 +19,9 @@ module.exports = {
     description: '/stop - Stop receiving notifications',
 
     /** Is the command listed in Telegram's command list? */
-    list: false,
+    list: function(user) {
+        return user.active;
+    },
 
     /**
      * Callback to execute when a user executes the command.

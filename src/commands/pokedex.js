@@ -8,6 +8,9 @@ var pokedex = require('../pokedex'),
  */
 module.exports = {
 
+    /** Command name */
+    name: '/pokedex',
+
     /** Command regex pattern */
     pattern: /\/pokedex/,
 
@@ -26,7 +29,7 @@ module.exports = {
      */
     callback: function(msg, match, user, created) {
         var names = [];
-        _.forEach(list, function(name, number) {
+        _.forEach(pokedex.pokedex, function(name, number) {
             names.push(number + ') ' + name);
         });
 
