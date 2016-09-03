@@ -8,6 +8,9 @@ var pokedex = require('../pokedex');
  */
 module.exports = {
 
+    /** Command name */
+    name: '/add',
+
     /** Command regex pattern */
     pattern: /\/add (.+)/,
 

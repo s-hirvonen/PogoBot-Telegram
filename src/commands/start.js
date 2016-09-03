@@ -9,6 +9,9 @@ var pokedex = require('../pokedex'),
  */
 module.exports = {
 
+    /** Command name */
+    name: '/start',
+
     /** Command regex pattern */
     pattern: /\/start/,
 

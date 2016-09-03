@@ -8,6 +8,9 @@ var pokedex = require('../pokedex');
  */
 module.exports = {
 
+    /** Command name */
+    name: '/list',
+
     /** Command regex pattern */
     pattern: /\/list/,
 
@@ -25,7 +28,7 @@ module.exports = {
      * @param {Boolean} created - Was the user created as a result of the command call?
      */
     callback: function(msg, match, user, created) {
-        var names = list.map(function(number) {
+        var names = user.watchlist.map(function(number) {
             return pokedex.pokedex[number];
         });
 

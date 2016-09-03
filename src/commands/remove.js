@@ -8,6 +8,9 @@ var pokedex = require('../pokedex');
  */
 module.exports = {
 
+    /** Command name */
+    name: '/remove',
+
     /** Command regex pattern */
     pattern: /\/remove (.+)/,
 

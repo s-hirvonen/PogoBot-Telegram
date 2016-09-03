@@ -8,6 +8,9 @@ var pokedex = require('../pokedex');
  */
 module.exports = {
 
+    /** Command name */
+    name: '/reset',
+
     /** Command regex pattern */
     pattern: /\/reset/,
 
