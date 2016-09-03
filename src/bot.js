@@ -4,24 +4,16 @@ var TelegramBot = require('node-telegram-bot-api'),
     logger = require('winston'),
     _ = require('lodash');
 
+/**
+ * Telegram bot.
+ */
 module.exports = function(config) {
 
     var bot = new TelegramBot(config.api_token, {polling: true});
     var commandManager = require('./commandManager')(config, bot);
-    var pokemon = config.watchlist;
     var exports = {};
 
-    var activeUsers = [];
-
-    // Public interface
-    // -----------------------------------------------------------------------
-
-    exports.broadcast = function(message) {
-        for (var i = 0; i < activeUsers.length; ++i) {
-            bot.sendMessage(activeUsers[i], message);
-        }
-    };
-
+    /** Sends a Google Maps static image and directions link to the watching users */
     exports.sendPhotoNotification = function(users, photo, caption, coords) {
         _.forEach(users, function(user) {
             bot.sendPhoto(user, photo).then(function() {
@@ -37,6 +29,7 @@ module.exports = function(config) {
         });
     }
 
+    /** Sends a Telegram location message to the watching users */
     exports.sendNotification = function(users, caption, coords) {
         users.map(function(user) {
             bot.sendMessage(user, caption)
@@ -50,4 +43,3 @@ module.exports = function(config) {
 
     return exports;
 }
-

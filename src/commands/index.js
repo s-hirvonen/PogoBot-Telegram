@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * Commands module.
+ * @module command
+ */
 module.exports = [
     require('./add'),
     require('./remove'),

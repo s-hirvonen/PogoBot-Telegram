@@ -3,8 +3,13 @@
 var User = require('./user'),
     commands = require('./commands');
 
+/**
+ * Command Manager.
+ * @module commandManager
+ */
 module.exports = function(config, bot) {
 
+    /** Help command is special; lists the descriptions of all other commands */
     bot.onText(/\/help/, function(msg) {
         bot.sendMessage(
             msg.from.id,
@@ -15,30 +20,29 @@ module.exports = function(config, bot) {
         );
     });
 
+    /** Enable all commands found in src/commands */
     commands.map(function(command) {
-        onCommand(command.pattern, command.callback);
-    });
-
-    function commandDescriptions() {
-        return commands.reduce(function(previous, current) {
-            return previous + '\n' + current.description;
-        }, '');
-    }
-
-    function onCommand(pattern, callback) {
-        bot.onText(pattern, function(msg, match) {
+        bot.onText(command.pattern, function(msg, match) {
             User.findOrCreate({ telegramId: msg.from.id }, function(err, user, created) {
                 if (err) {
                     logger.error(err);
                     return;
                 }
-                var replyMessage = callback(msg, match, user, created);
+
+                var replyMessage = command.callback(msg, match, user, created);
 
                 if (replyMessage) {
                     bot.sendMessage(msg.from.id, replyMessage);
                 }
             });
         });
+    });
+
+    /** Lists the descriptions for all available commands */
+    function commandDescriptions() {
+        return commands.reduce(function(previous, current) {
+            return previous + '\n' + current.description;
+        }, '');
     }
 };
 
