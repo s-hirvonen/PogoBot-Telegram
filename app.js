@@ -5,6 +5,10 @@ var logger   = require('winston'),
     config   = require('config.json')('./config.json'),
     mongoose = require('mongoose');
 
+if (process.env.NODE_ENV === 'development') {
+    logger.level = 'debug';
+}
+
 config.logger = logger;
 
 mongoose.Promise = global.Promise;

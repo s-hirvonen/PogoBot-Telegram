@@ -13,8 +13,6 @@ module.exports = function(config, bot, listener) {
     var pokemon = JSON.parse(fs.readFileSync('./locale/pokemon.en.json'));
     var seen = []; // Contains encounter data of already processed pokemen
 
-    logger.level = 'debug';
-
     // Webhook receives pokemon spawn info.
     // Unfiltered at this point
     listener.on('pokemon', function(payload) {
