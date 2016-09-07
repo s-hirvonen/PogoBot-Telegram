@@ -1,6 +1,7 @@
 'use strict';
 
-var pokedex = require('../pokedex');
+var pokedex = require('../pokedex'),
+    config   = require('config.json')('./config.json');
 
 /**
  * Reset command
@@ -28,8 +29,7 @@ module.exports = {
      * @param {Boolean} created - Was the user created as a result of the command call?
      */
     callback: function(msg, match, user, created) {
-        logger.info('Watchlist reset request from %s', msg.from.id);
-        user.watchlist = Pokedex.getPokemonIdsByNames(config.watchlist);
+        user.watchlist = pokedex.getPokemonIdsByNames(config.watchlist);
         user.save();
     }
 
