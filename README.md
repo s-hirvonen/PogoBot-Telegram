@@ -1,6 +1,8 @@
 PogoBot-Telegram
 ================
 
+## This project is currently on hold until the PokemonGo-Map project is functional
+
 Configurable PokemonGo-Map alerts via Telegram.  
 **Check the develop branch for the most recent updates**
 
