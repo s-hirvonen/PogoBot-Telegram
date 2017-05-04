@@ -1,7 +1,8 @@
 'use strict';
 
-var pokedex = require('../pokedex'),
-    logger = require('winston');
+var Pokedex = require('../pokedex'),
+    logger = require('winston'),
+    config = require('config.json')('./config.json');
 
 /**
  * Start command
