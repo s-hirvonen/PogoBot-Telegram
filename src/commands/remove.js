@@ -15,7 +15,7 @@ module.exports = {
     pattern: /\/remove (.+)/,
 
     /** Command's description to be listed in /help */
-    description: '/remove name [name]... - Removes Pokémon from the watchlist',
+    description: '/remove pokemon [name]... - Removes Pokémon from the watchlist',
 
     /** Is the command listed in Telegram's command list? */
     list: false,
